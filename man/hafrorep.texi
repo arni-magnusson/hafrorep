@@ -1,0 +1,993 @@
+\input texinfo
+@setfilename hafrorep.info
+@documentencoding UTF-8
+@afourpaper
+@paragraphindent 0
+@set VERSION 3.2
+@set DATE (2015-07-05)
+@c @set REVISED Revised manual (2015-04-20)
+@set YEARS 2014, 2015
+@macro hafrorep
+@code{hafrorep}
+@end macro
+@macro pkg{name}
+@sansserif{\name\}
+@end macro
+
+@copying
+Copyright @copyright{} @value{YEARS} Árni Magnússon & Sigurður Þór Jónsson
+@sp
+@hafrorep{} is released under the @LaTeX{} Project Public License.@*
+Source code: @uref{http://www.hafro.is/~arnima/hafrorep/hafrorep.cls}
+@end copying
+
+@titlepage
+@title hafrorep
+@subtitle A @LaTeX{} Class for Hafro Reports
+@subtitle Version @value{VERSION} @value{DATE}
+@c @subtitle @value{REVISED}
+@author Árni Magnússon & Sigurður Þór Jónsson
+@page
+@vskip 0pt plus 1filll
+@insertcopying
+@end titlepage
+
+@contents
+
+@chapter Introduction
+
+@section Background
+
+Between 2003 and 2013, the annual stock assessment report ``Ástandsskýrslan''
+(State of Marine Stocks in Icelandic Waters) was typeset in a 2-column format
+using Publisher. The table section was typeset in Word.
+@sp 0.5
+
+Overall, these MS Office tools proved inadequate for the job. Publisher tables
+were composite objects that broke when a new year was added, and were difficult
+to reassemble. The position of the header and page numbers tended to shift
+between pages. Instead of global document-wide settings, the typesetting
+approach in Publisher involved manually formatting a single object, paragraph,
+page, or chapter. The same shortcomings applied to the table section typeset in
+Word. The tables in Publisher and Word were difficult to modify, resulting in
+unexpected changes to the format. In the end, the table section in Word had
+become increasingly fragile, to the point that the document could not be opened,
+modified, and saved reliably.
+@sp 0.5
+
+In the spring and summer of 2014, experiments with typesetting Ástandsskýrslan
+in @LaTeX{} were undertaken by Árni Magnússon (assessment section, @LaTeX{}
+class) and Sigurður Þór Jónsson (table section, Sweave). The main findings were:
+@sp 0.5
+
+@itemize
+
+@item @LaTeX{} can mimic exactly the MS Office report format, both the overall
+2-column layout and details like boxes and shades. This was the thrust of
+@hafrorep{} version 1 which demonstrated the flexibility of @LaTeX, and provided
+an option to switch from MS Office to @LaTeX{} without debating potential
+changes to the report format.
+@sp 0.5
+
+@item However, @hafrorep{} version 1 also demonstrated that the 2-column layout
+is cumbersome to work with. Specifically when it comes to placement of figures
+and tables between and within paragraphs, fine-tuning vertical space to align
+columns, and constructing tables whose width is predefined to match the column
+width.
+
+@end itemize
+@sp 1.5
+
+@section Design
+
+The current design of @hafrorep{} aims to make the writing of Ástandsskýrslan as
+easy as possible, both for chapter authors and editors, while retaining the high
+quality and recognizable style of the report series. This is achieved by
+adopting a 1-column layout, which greatly simplifies the typesetting, but
+affects the layout in several ways.
+@sp 0.5
+
+An established rule in typography dictates that an average line of text should
+be around 65 characters in books, and 75 characters in articles. Reports typeset
+in a 1-column layout tend to have longer lines, around 85 characters. To avoid
+even longer lines, the solution is to use a relatively large font and wide
+horizontal margins.
+@sp 0.5
+
+Most of the in-text tables and figures span roughly half the text width, with
+the caption on the side. Wider tables and figures are also supported, with the
+caption above the table and below the figure. Automatic @LaTeX{} algorithms are
+utilized for the placement of tables and figures.
+@sp 0.5
+
+Compared to the 2-column layout of MS Office and @hafrorep{} version 1, the
+output has larger text and a greater amount of white space. As a result, the
+report fills a larger number of pages, which is a drawback considering paper
+use. This drawback, however, is more than offset by a number of important
+benefits.
+
+@page
+
+@section Benefits
+
+@enumerate
+
+@item Placement of tables and figures within each section, as well as the
+stretching of vertical spaces, is automated to a large degree. This used to be a
+time-consuming and frustrating process.
+@sp 0.5
+
+@item Document-wide settings apply uniformly across the entire report, resulting
+in fewer @w{discrepancies} between objects, paragraphs, pages, and chapters.
+@sp 0.5
+
+@item Cross-references to table and figure numbers are automated within the
+section.
+@sp 0.5
+
+@item Tables are much easier to update between years.
+@sp 0.5
+
+@item The table section corresponds to CSV (comma-separated values) files, which
+are archived and made available on @uref{http://data.hafro.is} after the report
+is published. From there, they can be read directly into statistical software
+for analysis. This is particularly useful for retrospective and literate data
+analysis. It also makes it easier for anyone (ministry, stakeholders, media,
+analysts, etc.)@: to access stock assessment data and results, providing more
+open access of public information.
+@sp 0.5
+
+@item Since @LaTeX{} uses text files, it is possible to track changes, undo, and
+backup using revision control. Files can be searched and compared using standard
+tools.
+@sp 0.5
+
+@item The compilation process is automated with scripts. The pathway from
+changing a sentence to creating a PDF of the entire report is now faster and
+less error-prone than the Publisher-Word-Acrobat tool chain, where 40 documents
+were opened manually and exported to postscript files, which were then manually
+dragged in the desired order.
+@sp 0.5
+
+@item Stock assessment scientists tend to use text files in their work, so
+@hafrorep{} and CSV data files integrate the writing of Ástandsskýrslan with the
+assessment workflow.
+@sp 0.5
+
+@item @LaTeX{} can be converted to other markup formats, such as HTML. It would
+require sub@-stantial work to produce clean and high-quality webpages
+(especially for the first time), but switching from MS Office to @LaTeX{} would
+be a significant step in that direction.
+@sp 0.5
+
+@end enumerate
+
+The design of @hafrorep{} focuses on the requirements of Ástandsskýrslan, but
+authors of other documents in the Hafró report series may find it useful as
+well.
+@sp 1.5
+
+@section Usage
+
+The @hafrorep{} class is used in the same way as @code{article}, @code{report},
+and other standard @LaTeX{} classes. Please note that:
+@sp 0.5
+
+@itemize
+
+@item The @file{hafrorep.cls} must be in the same directory as the document, or
+made available to @LaTeX{} in some other way.
+@sp 0.5
+
+@item The document must be ASCII or UTF-8 encoded (not Latin-1).
+@sp 0.5
+
+@item The degree character (°) is allowed in documents, but the en dash
+character (--) and curly right single quote (') are not. Use two hyphens (-{}-)
+and plain apostrophe
+@codequoteundirected on
+(@code{'})
+@codequoteundirected off
+instead.
+@sp 0.5
+
+@item External files are organized in three subdirectories: @file{abs}
+(abstracts), @file{figs} (figures), and @file{tabs} (tables).
+@sp 0.5
+
+@item Several @LaTeX{} packages are required (@pxref{dependencies,,Class
+dependencies}).
+@sp 0.5
+
+@item The document can be compiled with the @command{pdflatex} shell command.
+
+@end itemize
+@sp 1.5
+
+@page
+
+@section Examples
+
+The best way to learn how to use @hafrorep{} is to experiment with examples.
+Three examples have been prepared for this purpose:
+@sp
+
+@b{I -- hello.tex}
+
+A minimal @hafrorep{} document.
+@sp 0.5
+
+@example
+\documentclass@{hafrorep@}
+\begin@{document@}
+Hello world.
+\end@{document@}
+@end example
+@sp 1.2
+
+@b{II -- sael.tex}
+
+Icelandic text, UTF-8 encoded.
+@sp 1.5
+
+@b{III -- ufsi_2015 [directory]}
+@sp 0.2
+
+Full-featured example from Ástandsskýrslan 2015.
+@sp 1.5
+
+The examples are available on the SVN repository,
+@sp 0.2
+
+@example
+svn export svn://svn.hafro.is/verk/hafrorep
+@end example
+@sp 0.2
+
+and on the homepage:
+@sp 0.2
+
+@example
+@uref{http://www.hafro.is/~arnima/hafrorep}
+@end example
+@sp
+
+@chapter Options
+
+@section english
+
+@defopt english
+Use English grammar rules to split words between lines.@*
+Example:
+@example
+\documentclass[english]@{hafrorep@}
+\begin@{document@}
+A version of the Work that has been processed into a form where it is
+directly usable on a computer system. This processing may include using
+installation facilities provided by the Work, transformations of the
+Work, copying of components of the Work, or other activities. Note that
+modification of any installation facilities provided by the Work
+constitutes modification of the Work.
+\end@{document@}
+@end example
+@end defopt
+
+
+@chapter Large objects
+
+@section banner
+
+@deffn Command \banner
+Automatic banner with section number and Icelandic species name.@*
+Example:
+@example
+\banner
+@end example
+@end deffn
+@sp0.5
+
+@deffn Command \bannerenglish
+Automatic banner with section number and English species name.@*
+Example:
+@example
+\bannerenglish
+@end example
+@end deffn
+@sp0.5
+
+@deffn Command \bannerx prefix icelandic foreign
+Banner with a @var{prefix}, followed by the title in
+@var{icelandic} and a @var{foreign} language.@*
+Example:
+@example
+\bannerx\thesection\speciesIS\speciesLA
+@end example
+@end deffn
+@sp0.5
+
+@deffn Command \bigbanner top middle bottom
+Banner with three centered lines of text: @var{top}, @var{middle}, and
+@var{bottom}.@*
+Example:
+@example
+\bigbanner
+@{Ágrip af skýrslu Hafrannsóknastofnunar@}
+@{um nytjastofna sjávar 2012/2013 og@}
+@{aflahorfur fiskveiðiárið 2013/2014@}
+@end example
+@end deffn
+
+@section painting
+
+@deffn Command \painting file width xypos
+Image @var{file} from inside the @file{figs} directory, stretched to @var{width}
+and placed at @var{xypos}.@*
+Example:
+@example
+\painting@{ufsi@}@{4.3cm@}@{12.4cm,4.7cm@}
+@end example
+@end deffn
+@sp 1.5
+
+@page
+
+@section figmap
+
+@deffn Command \figmap file position icelandic english
+Figure showing a map image @var{file} from inside the @file{figs} directory,
+placed at a given @var{position}, with a caption in @var{icelandic} and
+@var{english}.@*
+Example:
+@example
+\figmap@{aflamynd_2012_3@}@{htbp@}
+@{Veiðisvæði við Ísland árið 2012.@}
+@{Fishing grounds in 2012.@}
+@end example
+@end deffn
+@sp 0.5
+
+@deffn Command \figmapx file position boldIS normIS boldEN normEN
+Like @code{\figmap}, except Icelandic caption is passed as @var{boldIS} and
+@var{normIS}, and English caption as @var{boldEN} and @var{normEN}.@*
+Example:
+@example
+\figmapx@{aflamynd_2012_11_efri@}@{htbp@}
+@{Úthafskarfi, efri stofn.@}
+@{Veiðisvæði íslenskra skipa árin 2001–-2012.@}
+@{Shallow pelagic redfish.@}
+@{Fishing grounds of the Icelandic fleet in 2001-–2012.@}
+@end example
+@end deffn
+
+@section fignum
+
+@deffn Command \fignum file label position icelandic english
+Figure showing an image @var{file} from inside the @file{figs} directory, tagged
+with a @var{label}, placed at a given @var{position}, with a caption in
+@var{icelandic} and @var{english} on the side of the figure.@*
+Example:
+@example
+\fignum@{ufsi_catch@}@{fig:landings@}@{htbp@}
+@{Landaður afli eftir veiðarfærum.@}
+@{Landings by gear type.@}
+@end example
+@end deffn
+@sp 0.5
+
+@deffn Command \fignumx file label position boldIS normIS boldEN normEN
+Like @code{\fignum}, except Icelandic caption is passed as @var{boldIS} and
+@var{normIS}, and English caption as @var{boldEN} and @var{normEN}.@*
+Example:
+@example
+\fignumx@{atumagn@}@{fig:plankton@}@{htbp@}
+@{$\!\!$@}
+@{Átumagn (g þurrvigt m\super@{--2@}, 0-–50 m) að vorlagi.@}
+@{$\!\!$@}
+@{Zooplankton biomass (g dry weight m\super@{--2@}, 0–-50 m) in spring.@}
+@end example
+@end deffn
+@sp 1.5
+
+@page
+
+@section figcenter
+
+@deffn Command \figcenter file label pos figwidth capwidth icelandic english
+Centered figure showing an image @var{file} from inside the @file{figs}
+directory, tagged with a @var{label}, placed at a given @var{pos}, a size of
+@var{figwidth} and @var{capwidth}, with a caption in @var{icelandic} and
+@var{english} below the figure.@*
+Example:
+@example
+\figcenter@{raekja_grunn@}@{fig:inshore@}@{htbp@}
+@{\textwidth@}@{0.95\textwidth@}
+@{Afli (lína) og vísitala stofnstærðar (súlur) á grunnslóð.@}
+@{Inshore catch (line) and biomass indices (columns).@}
+@end example
+@end deffn
+@sp 0.5
+
+@deffn Command \figcenterx file lab pos fwidth cwidth bIS nIS bEN nEN
+Like @code{\figcenter}, except Icelandic caption is passed as @var{bIS} and
+@var{nIS} (bold and normal), and English caption as @var{bEN} and @var{nEN}.@*
+Example:
+@example
+\figcenterx@{signlunes50ts@}@{fig:salinity@}@{htbp@}
+@{0.8\textwidth@}@{0.75\textwidth@}
+@{$\!\!$@}
+@{Hiti og selta að vori á 50 m dýpi á stöð 3.@}
+@{$\!\!$@}
+@{Temperature and salinity in spring at 50 m depth at station 3.@}
+@end example
+@end deffn
+
+@chapter Small macros
+
+@section Section
+
+@deffn Command \chapter
+Chapter heading, not inside a banner.
+@end deffn
+
+@deffn Command \chapterx
+Chapter heading, not inside a banner and not numbered.
+@end deffn
+
+@deffn Command \abstracts
+Insert abstracts into document (@file{is.tex} and @file{en.tex} inside
+subdirectory @file{tabs}).
+@end deffn
+
+@deffn Command \hafrochapter number icelandic english page
+TOC entry for chapter @var{number} with an @var{icelandic} and @var{english}
+title, and a @var{page} number.
+@end deffn
+
+@deffn Command \hafrochapterm number title page
+TOC entry for chapter @var{number} with a @var{title} and a @var{page} number,
+in medium font weight.
+@end deffn
+
+@deffn Command \hafrochapterx number title page
+TOC entry for chapter @var{number} with a @var{title} and a @var{page} number.
+@end deffn
+
+@deffn Command \hafrosection number icelandic english page
+TOC entry for section @var{number} with an @var{icelandic} and @var{english}
+title, and a @var{page} number.
+@end deffn
+
+@deffn Command \hafrosectionx number title page
+TOC entry for section @var{number} with a @var{title} and a @var{page} number.
+@end deffn
+@sp 1.5
+
+@section Table
+@anchor{tabcommands}
+
+@deffn Command \h
+Shorthand for @code{\hspace}.
+@end deffn
+
+@deffn Command \I height
+Establish @var{height} to increase vertical space above.
+@end deffn
+
+@deffn Command \m
+Shorthand for @code{\multicolumn}.
+@end deffn
+
+@deffn Command \mc label
+Centered column @var{label}.
+@end deffn
+
+@deffn Command \mci label
+Centered italic column @var{label}.
+@end deffn
+
+@deffn Command \mcI label
+Centered column @var{label} followed by a vertical line.
+@end deffn
+
+@deffn Command \mciI label
+Centered italic column @var{label} followed by a vertical line.
+@end deffn
+
+@deffn Command \ml label
+Left-aligned column @var{label}.
+@end deffn
+
+@deffn Command \mli label
+Left-aligned italic column @var{label}.
+@end deffn
+
+@deffn Command \mlI label
+Left-aligned column @var{label} followed by a vertical line.
+@end deffn
+
+@deffn Command \mliI label
+Left-aligned italic column @var{label} followed by a vertical line.
+@end deffn
+
+@deffn Command \p
+Shorthand for @code{\phantom}.
+@end deffn
+
+@deffn Command \s
+Shorthand for @code{\super}.
+@end deffn
+
+@deffn Command \tabsection
+Table section number.
+@end deffn
+
+@deffn Command \pathstamp url1 [url2]
+Stamp URL(s) at the bottom of the page.
+@end deffn
+
+@sp 1.5
+
+@section Character
+
+@deffn Command \b
+Boldface.
+@end deffn
+
+@deffn Command \i
+Italic.
+@end deffn
+
+@deffn Command \f number
+Footnote @var{number}.
+@end deffn
+
+@deffn Command \super text
+Superscript @var{text}.
+@end deffn
+
+@deffn Command \superi text
+Superscript @var{text} with alternative kerning.
+@end deffn
+
+@deffn Command \sub text
+Subscript @var{text}.
+@end deffn
+
+@chapter User guidelines
+
+@section Species name
+
+The species name is defined in the preamble of each section in three languages
+(Icelandic, English, and Latin), using the macros @code{\speciesIS},
+@code{\speciesEN}, and @code{\speciesLA}.@*
+Example:
+@example
+\renewcommand\speciesIS@{Ufsi@}
+\renewcommand\speciesEN@{Saithe@}
+\renewcommand\speciesLA@{Pollachius virens@}
+@end example
+@sp 0.2
+
+These macros are used internally by @hafrorep{} to produce banners and figure
+captions. They are also used manually to produce table captions.
+@sp 2
+
+@section Cross-references
+
+Table and figure numbers inside each section are cross-referenced using the
+@code{\ref@{}@var{label}@code{@}} command, which automatically produces the
+correct table and figure number.@*
+Example:
+@example
+tafla \ref@{tab:advice@}    =>   tafla  2.3.1
+mynd \ref@{fig:landings@}   =>   mynd   2.3.1
+@end example
+@sp 0.5
+
+Table numbers from the table section, on the other hand, are cross-referenced
+using the @code{\tabsection} command, which produces the correct prefix, but the
+author must specify the correct table number.@*
+Example:
+@example
+tafla \tabsection.1       =>   tafla  3.3.1
+@end example
+@sp 2
+
+@page
+
+@section Constructing a table
+
+When constructing a table in a document, the following guidelines apply:
+@sp 0.5
+
+@enumerate
+
+@item If the table can be made narrow, it saves space in the report to put the
+caption on the side, instead of above the table. To make the table narrow
+enough, adjust @code{\tabcolsep} until the table caption width is equal to
+figure captions.
+@sp 0.5
+
+@item All tables within a chapter are typeset using the @code{\floatbox} command
+from the @pkg{floatrow} package. It has the following form:
+@example
+\floatbox[\capbeside]@{table@}[\FBwidth]
+@{\caption@{...@}\label@{...@}@}
+@{\begin@{tabular@}...\end@{tabular@}@}
+@end example
+for a side caption, or replacing @code{\capbeside} with @code{\captop} for a top
+caption.
+@sp 0.5
+
+@item When numeric columns contain entries of unequal length, they are
+left-aligned or right-aligned, but at the same time also shifted by a fixed
+indentation so the numbers end up close the center of the column. This
+indentation (within columns) is specified using directives like
+@code{<@{\hspace@{}@var{length}@code{@}@}} that are provided by the @pkg{array}
+package.
+@sp 0.5
+
+@item Column labels are specified with @code{\mc}, @code{\mci}, and other
+shorthand notations (@pxref{tabcommands,,table macros}), where @samp{c} means
+centered, @samp{l} means left-aligned, @samp{i} means italic, and @samp{I}
+produces a vertical line.
+@sp 0.5
+
+@item Vertical space is controlled using the @code{\I@{}@var{length}@code{@}}
+command for the space above a given row, and the @code{\\[}@var{length}@code{]}
+command for the space below.
+@sp 0.5
+
+@item Footnote numbers can be formatted using the shorthand command @code{\f}.
+
+@end enumerate
+@sp 0.5
+
+It is challenging to construct a table for the first time, but very easy to
+update a table from a previous report (modify the numbers or add one more line).
+@sp 1.5
+
+@chapter Acknowledgements
+
+Þorsteinn Sigurðsson and Birkir Bárðarson have grumbled about the shortcomings
+of MS Office for typesetting Ástandsskýrslan over the years. Their detailed
+criticism served as the initial blueprint for @hafrorep.
+@sp 0.5
+
+Gunnar Gunnarsson (at Orkuveita Reykjavíkur) evaluated @hafrorep{} 1.1 and made
+valuable suggestions that led to version 2.0.
+@sp 0.5
+
+Kristján Kristinsson provided the solution to format enumerated lists with
+minimal vertical spacing, incorporated in version 2.12.
+@sp 0.5
+
+Birkir Bárðarson reported a bug in the table of contents dots, fixed in version
+2.14.
+
+@appendix Dependencies
+@anchor{dependencies}
+@sp 0.5
+
+The @hafrorep{} class requires the following @LaTeX{} packages:
+@sp 1.5
+
+@b{Character}
+@itemize
+@item @pkg{babel}
+@item @pkg{inputenc}
+@item @pkg{fontenc}
+@end itemize
+@sp 1.2
+
+@b{Page}
+@itemize
+@item @pkg{geometry}
+@end itemize
+@sp 1.2
+
+@b{Header and footer}
+@itemize
+@item @pkg{color}
+@item @pkg{fancyhdr}
+@end itemize
+@sp 1.2
+
+@b{Table of contents}
+@itemize
+@item @pkg{tocloft}
+@end itemize
+@sp 1.2
+
+@b{Section}
+@itemize
+@item @pkg{tikz}
+@item @pkg{titlesec}
+@end itemize
+@sp 1.2
+
+@b{Paragraph}
+@itemize
+@item @pkg{multicol}
+@end itemize
+@sp 1.2
+
+@b{List}
+@itemize
+@item @pkg{enumitem}
+@end itemize
+@sp 1.2
+
+@b{Table}
+@itemize
+@item @pkg{array}
+@item @pkg{rotating}
+@end itemize
+@sp 1.2
+
+@b{Figure}
+@itemize
+@item @pkg{graphicx}
+@item @pkg{textpos}
+@end itemize
+@sp 1.2
+
+@b{Caption}
+@itemize
+@item @pkg{caption}
+@item @pkg{floatrow}
+@end itemize
+
+@appendix Release history
+
+@heading{Version 3.2}
+@slanted{5 July 2015}
+@itemize
+
+@item New document option @option{[english]}.
+
+@end itemize
+@sp
+
+@heading{Version 3.1}
+@slanted{4 July 2015}
+@itemize
+
+@item Equal spacing between dots in table of contents.
+
+@item New commands: @code{\bannerenglish}, @code{\hafrochapterm},
+@code{\hafrosectionx}.
+
+@end itemize
+@sp
+
+@heading{Version 3.0}
+@slanted{16 June 2015}
+@itemize
+
+@item @code{\abstracts} clears floats before inserting the abstracts.
+
+@item @code{\banner} takes zero arguments, breaking backward compatibility.
+
+@item @code{\pathstamp} inserts blank lines before and after the textblock, to
+prevent warnings.
+
+@item Page numbers in table of contents are never bold.
+
+@item New commands: @code{\bannerx}, @code{\s}.
+
+@end itemize
+@sp
+
+@heading{Version 2.14}
+@slanted{10 June 2015}
+@itemize
+
+@item Dots in table of contents are slanted, and not bold.
+
+@item New command: @code{\pathstamp}.
+
+@end itemize
+@sp
+
+@heading{Version 2.13}
+@slanted{9 June 2015}
+@itemize
+
+@item Table of contents uses slanted letters.
+
+@item Depends on package @pkg{multicol}.
+
+@end itemize
+@sp
+
+@heading{Version 2.12}
+@slanted{7 June 2015}
+@itemize
+
+@item French spacing used everywhere.
+
+@item Enumerated lists with minimal vertical spacing.
+
+@item New commands: @code{\abstracts}, @code{\h}, @code{\hafrochapter},
+@code{\hafrochapterx}, @code{\hafrosection}, @code{\p}.
+
+@item Removed command: @code{\u}.
+
+@item Depends on packages @pkg{enumitem}, @pkg{rotating}, @pkg{tocloft}.
+
+@item Does not depend on package @pkg{ulem}.
+
+@end itemize
+@sp
+
+@page
+
+@heading{Version 2.11}
+@slanted{22 April 2015}
+@itemize
+
+@item En dash character (U+2013) and curly right single quote (U+2019) in
+document give error messages.
+
+@end itemize
+@sp
+
+@heading{Version 2.10}
+@slanted{20 April 2015}
+@itemize
+
+@item Default caption format is @samp{tabcap}, to simplify table input files.
+
+@end itemize
+@sp
+
+@heading{Version 2.9}
+@slanted{18 April 2015}
+@itemize
+
+@item Degree symbol can be used in @LaTeX@ input file, without special commands.
+
+@end itemize
+@sp
+
+@heading{Version 2.8}
+@slanted{18 April 2015}
+@itemize
+
+@item Tables can have caption on the side.
+
+@item All floats support the @option{[H]} placement option.
+
+@item Depends on package @pkg{floatrow}.
+
+@item Does not depend on packages @pkg{float}, @pkg{sidecap}.
+
+@end itemize
+@sp
+
+@heading{Version 2.7}
+@slanted{15 April 2015}
+@itemize
+
+@item Does not depend on package @pkg{subscript}, which is unavailable for
+MiK@TeX.
+
+@end itemize
+@sp
+
+@heading{Version 2.6}
+@slanted{12 April 2015}
+@itemize
+
+@item Depends on package @pkg{subscript}.
+
+@end itemize
+@sp
+
+@heading{Version 2.5}
+@slanted{12 April 2015}
+@itemize
+
+@item New command: @code{\superi}.
+
+@end itemize
+@sp
+
+@heading{Version 2.4}
+@slanted{10 April 2015}
+@itemize
+
+@item Top banner is boxed and shaded.
+
+@item New commands: @code{\bigbanner}, @code{\chapter}, @code{\chapterx},
+@code{\figcenter}, @code{\figcenterx}, @code{\figmapx}, @code{\fignumx}.
+
+@item Depends on packages @pkg{float}, @pkg{tikz}.
+
+@end itemize
+@sp
+
+@page
+
+@heading{Version 2.3}
+@slanted{26 September 2014}
+@itemize
+
+@item Increased horizontal margins.
+
+@end itemize
+@sp
+
+@heading{Version 2.2}
+@slanted{22 September 2014}
+@itemize
+
+@item New command: @code{\sub}.
+
+@end itemize
+@sp
+
+@heading{Version 2.1}
+@slanted{13 September 2014}
+@itemize
+
+@item Increased top margin.
+
+@item French spacing in figure captions.
+
+@end itemize
+
+@heading{Version 2.0}
+@slanted{12 September 2014}
+@itemize
+
+@item Everything simplified, not backward compatible with version 1.
+
+@item 1-column layout, Computer Modern 11 pt font.
+
+@item Tables and figures float automatically.
+
+@item Top banner is plain (not boxed, not shaded).
+
+@item Tables are plain (not boxed, no fixed width, no background color).
+
+@item Figures are plain (not boxed, not shaded), caption is beside the figure,
+and vertical spacing is automatic.
+
+@item New commands: @code{\m}, @code{\mci}, @code{\mciI}, @code{\ml},
+@code{\mli}, @code{\mlI}, @code{\mliI}, @code{\speciesIS}, @code{\speciesEN},
+@code{\speciesLA}.
+
+@item Removed commands: @code{\pause}, @code{\newcolumn}, @code{\mIc},
+@code{\mIcI}, @code{\mIlI}.
+
+@item Depends on packages @pkg{array}, @pkg{caption}, @pkg{color},
+@pkg{sidecap}, @pkg{titlesec}.
+
+@item Does not depend on packages @pkg{indentfirst}, @pkg{multicol},
+@pkg{tabularx}, @pkg{tikz}, @pkg{txfonts}, @pkg{xcolor}.
+
+@end itemize
+@sp
+
+@heading{Version 1.1}
+@slanted{12 September 2014}
+@itemize
+
+@item New command @code{\u}.
+
+@item Depends on package @pkg{ulem}.
+
+@end itemize
+@sp
+
+@heading{Version 1.0}
+@slanted{12 June 2014}
+@itemize
+
+@item Initial release, mimics the previous 2-column layout exactly.
+
+@end itemize
+
+@bye
