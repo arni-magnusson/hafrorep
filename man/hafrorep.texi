@@ -272,7 +272,6 @@ constitutes modification of the Work.
 @end example
 @end defopt
 
-
 @chapter Large objects
 
 @section banner
